@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ニュースアプリ（iOS9対応）</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 900px;
+      margin: auto;
+      padding: 10px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      gap: 10px;
+    }
+
+    .tab {
+      padding: 10px 15px;
+      border: 1px solid #333;
+      cursor: pointer;
+      border-radius: 8px;
+      background: #f2f2f2;
+    }
+
+    .tab.active {
+      background: #333;
+      color: white;
+    }
+
+    .news-item {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>📰 ニュースアプリ（iOS9対応）</h1>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('nhk', this)">🇯🇵 NHK</div>
+  <div class="tab" onclick="showTab('japan', this)">🗾 日本</div>
+  <div class="tab" onclick="showTab('world', this)">🌍 海外</div>
+</div>
+
+<div id="nhk" class="section active"></div>
+<div id="japan" class="section"></div>
+<div id="world" class="section"></div>
+
+<script>
+
+var API_KEY = "aca022f3c79e464493b5c92a06746407";
+
+/* -------------------------
+   タブ切替（iOS9対応）
+------------------------- */
+function showTab(id, el) {
+  var sections = document.getElementsByClassName("section");
+  var tabs = document.getElementsByClassName("tab");
+
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].classList.remove("active");
+  }
+
+  for (var j = 0; j < tabs.length; j++) {
+    tabs[j].classList.remove("active");
+  }
+
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
+}
+
+/* -------------------------
+   NHKニュース
+------------------------- */
+function loadNHK() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml");
+
+  xhr.onload = function () {
+    var data = JSON.parse(xhr.responseText);
+    var container = document.getElementById("nhk");
+
+    for (var i = 0; i < 7; i++) {
+      var item = data.items[i];
+
+      container.innerHTML +=
+        '<div class="news-item">' +
+        '<a href="' + item.link + '" target="_blank">' +
+        item.title +
+        '</a></div>';
+    }
+  };
+
+  xhr.send();
+}
+
+/* -------------------------
+   日本ニュース
+------------------------- */
+function loadJapan() {
+  var xhr = new XMLHttpRequest();
+  var url = "https://newsapi.org/v2/top-headlines?country=jp&pageSize=7&apiKey=" + API_KEY;
+
+  xhr.open("GET", url);
+
+  xhr.onload = function () {
+    var data = JSON.parse(xhr.responseText);
+    var container = document.getElementById("japan");
+
+    for (var i = 0; i < data.articles.length; i++) {
+      var article = data.articles[i];
+
+      container.innerHTML +=
+        '<div class="news-item">' +
+        '<a href="' + article.url + '" target="_blank">' +
+        article.title +
+        '</a></div>';
+    }
+  };
+
+  xhr.send();
+}
+
+/* -------------------------
+   海外ニュース
+------------------------- */
+function loadWorld() {
+  var xhr = new XMLHttpRequest();
+  var url = "https://newsapi.org/v2/top-headlines?country=us&pageSize=7&apiKey=" + API_KEY;
+
+  xhr.open("GET", url);
+
+  xhr.onload = function () {
+    var data = JSON.parse(xhr.responseText);
+    var container = document.getElementById("world");
+
+    for (var i = 0; i < data.articles.length; i++) {
+      var article = data.articles[i];
+
+      container.innerHTML +=
+        '<div class="news-item">' +
+        '<a href="' + article.url + '" target="_blank">' +
+        article.title +
+        '</a></div>';
+    }
+  };
+
+  xhr.send();
+}
+
+/* -------------------------
+   初期読み込み
+------------------------- */
+loadNHK();
+loadJapan();
+loadWorld();
+
+</script>
+
+</body>
+</html>
