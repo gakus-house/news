@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ニュース配信サイト</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      border-bottom: 2px solid #333;
+      padding-bottom: 5px;
+    }
+    .news-item {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📰 ニュース配信</h1>
+
+<h2>🇯🇵 NHKニュース</h2>
+<div id="nhk"></div>
+
+<h2>🌍 世界ニュース</h2>
+<div id="world"></div>
+
+<script>
+// ----------------------
+// NHK RSS取得
+// ----------------------
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www3.nhk.or.jp/rss/news/cat0.xml")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("nhk");
+
+    data.items.slice(0, 5).forEach(item => {
+      container.innerHTML += `
+        <div class="news-item">
+          <a href="${item.link}" target="_blank">
+            ${item.title}
+          </a>
+        </div>
+      `;
+    });
+  });
+
+// ----------------------
+// NewsAPI（世界ニュース）
+// ----------------------
+const API_KEY = "aca022f3c79e464493b5c92a06746407";
+
+fetch(`https://newsapi.org/v2/top-headlines?country=us&pageSize=5&apiKey=${API_KEY}`)
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("world");
+
+    data.articles.forEach(article => {
+      container.innerHTML += `
+        <div class="news-item">
+          <a href="${article.url}" target="_blank">
+            ${article.title}
+          </a>
+        </div>
+      `;
+    });
+  });
+</script>
+
+</body>
+</html>
